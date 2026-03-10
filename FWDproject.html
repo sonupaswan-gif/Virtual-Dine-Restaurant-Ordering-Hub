@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Virtual Dine – Ordering Hub</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f4f4f4;
+}
+
+/* Header */
+
+header{
+background:#e23744;
+color:white;
+padding:15px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+header button{
+background:white;
+color:#e23744;
+border:none;
+padding:8px 15px;
+border-radius:5px;
+cursor:pointer;
+font-weight:bold;
+}
+
+/* Room Section */
+
+.room-selection{
+background:white;
+margin:20px;
+padding:20px;
+border-radius:10px;
+text-align:center;
+}
+
+.room-container{
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.room-card{
+background:white;
+border-radius:10px;
+width:200px;
+padding:10px;
+box-shadow:0 4px 8px rgba(0,0,0,0.1);
+cursor:pointer;
+}
+
+.room-card img{
+width:100%;
+height:120px;
+object-fit:cover;
+border-radius:10px;
+}
+
+.room-card:hover{
+transform:scale(1.05);
+}
+
+/* Cuisine Buttons */
+
+.cuisines{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+padding:20px;
+}
+
+.cuisines button{
+background:white;
+border:1px solid #e23744;
+color:#e23744;
+padding:8px 12px;
+border-radius:20px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.cuisines button:hover{
+background:#e23744;
+color:white;
+}
+
+/* Food Cards */
+
+.food-container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+padding:20px;
+}
+
+.food-card{
+background:white;
+border-radius:10px;
+box-shadow:0 4px 8px rgba(0,0,0,0.1);
+overflow:hidden;
+}
+
+.food-card img{
+width:100%;
+height:200px;
+object-fit:contain;
+background:#fff;
+}
+
+.food-card div{
+padding:15px;
+}
+
+.food-card button{
+background:#e23744;
+color:white;
+border:none;
+padding:8px;
+width:100%;
+border-radius:5px;
+cursor:pointer;
+}
+
+/* Cart */
+
+#cart{
+background:white;
+padding:20px;
+margin:20px;
+border-radius:10px;
+display:none;
+}
+
+.cart-item{
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+}
+
+.cart-item button{
+background:red;
+color:white;
+border:none;
+padding:4px 8px;
+border-radius:4px;
+cursor:pointer;
+}
+
+.total{
+font-weight:bold;
+margin-top:10px;
+}
+
+.place-order{
+background:green;
+color:white;
+border:none;
+padding:10px;
+width:100%;
+border-radius:5px;
+margin-top:10px;
+cursor:pointer;
+}
+
+/* Footer */
+
+footer{
+background:#333;
+color:white;
+text-align:center;
+padding:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Virtual Dine</h1>
+<button onclick="toggleCart()">🛒 Cart</button>
+</header>
+
+<!-- Room Selection -->
+
+<div class="room-selection">
+
+<h2>Select Dining Room</h2>
+
+<div class="room-container">
+
+<div class="room-card" onclick="selectRoom('Couple Room',500)">
+<img src="couple-room.jpg">
+<h3>💑 Couple Room</h3>
+<p>Price : ₹500</p>
+</div>
+
+<div class="room-card" onclick="selectRoom('Family Room',800)">
+<img src="family-room.jpg">
+<h3>👨‍👩‍👧 Family Room</h3>
+<p>Price : ₹800</p>
+</div>
+
+<div class="room-card" onclick="selectRoom('Regular Table',200)">
+<img src="regular-table.jpg">
+<h3>🍽 Regular Table</h3>
+<p>Price : ₹200</p>
+</div>
+
+</div>
+
+<p id="selectedRoom"></p>
+
+</div>
+
+<!-- Cuisine Buttons -->
+
+<div class="cuisines">
+
+<button onclick="showCuisine('italian')">Italian</button>
+<button onclick="showCuisine('indian')">Indian</button>
+<button onclick="showCuisine('continental')">Continental</button>
+<button onclick="showCuisine('chinese')">Chinese</button>
+<button onclick="showCuisine('mexican')">Mexican</button>
+<button onclick="showCuisine('japanese')">Japanese</button>
+<button onclick="showCuisine('thai')">Thai</button>
+<button onclick="showCuisine('mediterranean')">Mediterranean</button>
+<button onclick="showCuisine('indoChinese')">Indo-Chinese</button>
+
+</div>
+
+<div class="food-container" id="foodContainer"></div>
+
+<!-- Cart -->
+
+<div id="cart">
+
+<h2>Your Cart</h2>
+
+<div id="cartItems"></div>
+
+<div class="total" id="totalAmount"></div>
+
+<button class="place-order" onclick="placeOrder()">Place Order</button>
+
+</div>
+
+<footer>
+
+© 2026 Virtual Dine | Academic Project
+
+</footer>
+
+<script>
+
+/* Room Selection */
+
+let selectedRoom="";
+let roomPrice=0;
+
+function selectRoom(room,price){
+
+selectedRoom=room;
+roomPrice=price;
+
+document.getElementById("selectedRoom").innerText=
+"Selected Room : "+room+" (₹"+price+")";
+
+}
+
+/* Food Data */
+
+const foodData={
+
+italian:[
+{name:"Bruschetta",price:180,img:"bruschetta.jpg"},
+{name:"Garlic Bread",price:150,img:"garlicbread.jpg"},
+{name:"Margherita Pizza",price:250,img:"pizza.jpg"},
+{name:"Pasta Alfredo",price:220,img:"pasta.jpg"},
+{name:"Lasagna",price:300,img:"lasagna.jpg"}
+],
+
+indian:[
+{name:"Paneer Tikka",price:220,img:"paneer-tikka.jpg"},
+{name:"Chicken Tikka",price:250,img:"chicken-tikka.jpg"},
+{name:"Paneer Butter Masala",price:260,img:"paneer.jpg"},
+{name:"Butter Chicken",price:320,img:"butter-chicken.jpg"},
+{name:"Chicken Biryani",price:300,img:"biryani.jpg"}
+],
+
+continental:[
+{name:"Tomato Soup",price:120,img:"soup.jpg"},
+{name:"Caesar Salad",price:150,img:"salad.jpg"},
+{name:"Grilled Chicken",price:280,img:"grilled-chicken.jpg"},
+{name:"Veg Steak",price:300,img:"veg-steak.jpg"}
+],
+
+chinese:[
+{name:"Spring Rolls",price:160,img:"springroll.jpg"},
+{name:"Veg Manchow Soup",price:140,img:"manchowsoup.jpg"},
+{name:"Veg Noodles",price:200,img:"noodles.jpg"},
+{name:"Fried Rice",price:210,img:"friedrice.jpg"}
+],
+
+mexican:[
+{name:"Nachos",price:180,img:"nachos.jpg"},
+{name:"Tacos",price:240,img:"tacos.jpg"},
+{name:"Burrito",price:260,img:"burrito.jpg"}
+],
+
+japanese:[
+{name:"Sushi",price:350,img:"sushi.jpg"},
+{name:"Ramen",price:320,img:"ramen.jpg"}
+],
+
+thai:[
+{name:"Thai Soup",price:160,img:"thaisoup.jpg"},
+{name:"Pad Thai",price:270,img:"pad-thai.jpg"},
+{name:"Green Curry",price:290,img:"greencurry.jpg"}
+],
+
+mediterranean:[
+{name:"Hummus",price:170,img:"hummus.jpg"},
+{name:"Falafel Platter",price:230,img:"falafel.jpg"},
+{name:"Greek Salad",price:210,img:"greeksalad.jpg"}
+],
+
+indoChinese:[
+{name:"Gobi Manchurian",price:190,img:"gobi.jpg"},
+{name:"Chicken Manchurian",price:240,img:"manchurian.jpg"},
+{name:"Hakka Noodles",price:220,img:"hakka.jpg"}
+]
+
+};
+
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+
+/* Show Cuisine */
+
+function showCuisine(type){
+
+const container=document.getElementById("foodContainer");
+
+container.innerHTML="";
+
+foodData[type].forEach(item=>{
+
+container.innerHTML+=`
+
+<div class="food-card">
+
+<img src="${item.img}">
+
+<div>
+
+<h4>${item.name}</h4>
+
+<p>₹${item.price}</p>
+
+<button onclick='addToCart(${JSON.stringify(item)})'>Add to Cart</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+/* Add to Cart */
+
+function addToCart(item){
+
+cart.push(item);
+
+localStorage.setItem("cart",JSON.stringify(cart));
+
+alert("Added to cart");
+
+}
+
+/* Toggle Cart */
+
+function toggleCart(){
+
+const cartDiv=document.getElementById("cart");
+
+cartDiv.style.display=cartDiv.style.display==="none"?"block":"none";
+
+showCart();
+
+}
+
+/* Show Cart */
+
+function showCart(){
+
+const cartItems=document.getElementById("cartItems");
+
+const totalAmount=document.getElementById("totalAmount");
+
+cartItems.innerHTML="";
+
+let total=roomPrice;
+
+if(selectedRoom!==""){
+
+cartItems.innerHTML+=`
+
+<div class="cart-item">
+
+<span>${selectedRoom}</span>
+
+<span>₹${roomPrice}</span>
+
+</div>
+
+`;
+
+}
+
+cart.forEach((item,index)=>{
+
+total+=item.price;
+
+cartItems.innerHTML+=`
+
+<div class="cart-item">
+
+<span>${item.name}</span>
+
+<span>₹${item.price}</span>
+
+<button onclick="removeItem(${index})">❌</button>
+
+</div>
+
+`;
+
+});
+
+totalAmount.innerText="Total : ₹"+total;
+
+}
+
+/* Remove Item */
+
+function removeItem(index){
+
+cart.splice(index,1);
+
+localStorage.setItem("cart",JSON.stringify(cart));
+
+showCart();
+
+}
+
+/* Place Order */
+
+function placeOrder(){
+
+if(selectedRoom===""){
+
+alert("Please select a dining room first!");
+
+return;
+
+}
+
+if(cart.length===0){
+
+alert("Cart is empty!");
+
+return;
+
+}
+
+alert("Order placed successfully 🍽\nRoom : "+selectedRoom+"\nRoom Cost : ₹"+roomPrice);
+
+cart=[];
+localStorage.removeItem("cart");
+
+showCart();}
+</script>
+</body>
+</html>
