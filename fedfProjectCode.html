@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Airline Seat Selection</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            text-align:center;
+            background:#f4f4f4;
+        }
+
+        .seats{
+            display:grid;
+            grid-template-columns:repeat(6,70px);
+            gap:10px;
+            justify-content:center;
+            margin-top:20px;
+        }
+
+        .seat{
+            width:60px;
+            height:60px;
+            line-height:60px;
+            color:white;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:bold;
+        }
+
+        .economy{
+            background:green;
+        }
+
+        .business{
+            background:orange;
+        }
+
+        .first{
+            background:purple;
+        }
+
+        .selected{
+            background:blue !important;
+        }
+
+        .booked{
+            background:red !important;
+            cursor:not-allowed;
+        }
+
+        button{
+            padding:10px;
+            margin:5px;
+            border:none;
+            background:#007bff;
+            color:white;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <h1>Airline Seat Selection System</h1>
+
+    <!-- Class Filter -->
+    <button onclick="filterSeats('all')">All</button>
+    <button onclick="filterSeats('Economy')">Economy</button>
+    <button onclick="filterSeats('Business')">Business</button>
+    <button onclick="filterSeats('First')">First</button>
+
+    <!-- Seat Map -->
+    <div class="seats" id="seatContainer"></div>
+
+    <!-- Booking Details -->
+    <h3>Selected Seats: <span id="selected">None</span></h3>
+
+    <h3>Total Price: ₹<span id="price">0</span></h3>
+
+    <h3>Timer: <span id="timer">60</span> sec</h3>
+
+    <button onclick="confirmBooking()">Confirm Booking</button>
+
+<script>
+
+    const seatContainer = document.getElementById("seatContainer");
+
+    let selectedSeats = [];
+
+    let totalPrice = 0;
+
+    let timer = 60;
+
+    const prices = {
+        Economy:2000,
+        Business:5000,
+        First:10000
+    };
+
+    // Create Seats
+    for(let i=1;i<=30;i++){
+
+        let seatClass="Economy";
+
+        if(i<=6){
+            seatClass="First";
+        }
+        else if(i<=12){
+            seatClass="Business";
+        }
+
+        let seat=document.createElement("div");
+
+        seat.classList.add("seat",seatClass.toLowerCase());
+
+        seat.innerText=i;
+
+        seat.dataset.class=seatClass;
+
+        // Random booked seats
+        if(Math.random()<0.2){
+            seat.classList.add("booked");
+        }
+
+        seat.onclick=function(){
+
+            if(seat.classList.contains("booked")){
+                return;
+            }
+
+            if(seat.classList.contains("selected")){
+
+                seat.classList.remove("selected");
+
+                selectedSeats =
+                selectedSeats.filter(s=>s!=i);
+
+                totalPrice -= prices[seatClass];
+            }
+            else{
+
+                seat.classList.add("selected");
+
+                selectedSeats.push(i);
+
+                totalPrice += prices[seatClass];
+            }
+
+            updateDetails();
+        };
+
+        seatContainer.appendChild(seat);
+    }
+
+    // Update Price and Seats
+    function updateDetails(){
+
+        document.getElementById("selected").innerText =
+        selectedSeats.length ?
+        selectedSeats.join(", ") :
+        "None";
+
+        document.getElementById("price").innerText =
+        totalPrice;
+    }
+
+    // Filter Seats
+    function filterSeats(type){
+
+        let seats=document.querySelectorAll(".seat");
+
+        seats.forEach(seat=>{
+
+            if(type=="all" ||
+            seat.dataset.class==type){
+
+                seat.style.display="block";
+            }
+            else{
+                seat.style.display="none";
+            }
+        });
+    }
+
+    // Confirm Booking
+    function confirmBooking(){
+
+        if(selectedSeats.length==0){
+            alert("Select seats first");
+            return;
+        }
+
+        alert(
+        "Booking Confirmed\nSeats: "
+        + selectedSeats +
+        "\nTotal: ₹" + totalPrice
+        );
+    }
+
+    // Timer
+    setInterval(()=>{
+
+        if(timer>0){
+
+            timer--;
+
+            document.getElementById("timer")
+            .innerText=timer;
+        }
+        else{
+
+            alert("Seat lock expired");
+
+            location.reload();
+        }
+
+    },1000);
+
+</script>
+
+</body>
+</html>
